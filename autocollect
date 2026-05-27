@@ -1,88 +1,11 @@
 local LP = game:GetService("Players").LocalPlayer
 
-local COLORS = {
-    Bag = Color3.fromRGB(255, 215, 0),
-    SafetyStatue = Color3.fromRGB(0, 200, 255),
-}
-
 local function getTorso()
     local char = LP.Character
     if not char then return nil end
     return char:FindFirstChild("HumanoidRootPart")
         or char:FindFirstChild("Torso")
         or char:FindFirstChild("UpperTorso")
-end
-
-local function createESPOnce(instance, label, color)
-    local hit = instance:FindFirstChild("hit")
-    if not hit then return end
-
-    local outline = Drawing.new("Square")
-    outline.Thickness = 3
-    outline.Color = Color3.fromRGB(0, 0, 0)
-    outline.Filled = false
-    outline.Visible = false
-
-    local box = Drawing.new("Square")
-    box.Thickness = 1
-    box.Color = color
-    box.Filled = false
-    box.Visible = false
-
-    local text = Drawing.new("Text")
-    text.Text = label
-    text.Color = color
-    text.Outline = true
-    text.Center = true
-    text.Size = 14
-    text.Visible = false
-
-    local torso = getTorso()
-    if torso then
-        torso.CFrame = hit.CFrame
-    end
-
-    local elapsed = 0
-    while elapsed < 2 do
-        if not instance.Parent then break end
-        hit = instance:FindFirstChild("hit")
-        if not hit then break end
-
-        local top, on1 = WorldToScreen(hit.Position + Vector3.new(0, 2, 0))
-        local bottom, on2 = WorldToScreen(hit.Position - Vector3.new(0, 2, 0))
-
-        if on1 and on2 then
-            local h = math.abs(top.Y - bottom.Y)
-            local w = h
-            box.Position = Vector2.new(top.X - w / 2, top.Y)
-            box.Size = Vector2.new(w, h)
-            outline.Position = Vector2.new(top.X - w / 2, top.Y)
-            outline.Size = Vector2.new(w, h)
-            text.Position = Vector2.new(top.X, top.Y - 16)
-            box.Visible = true
-            outline.Visible = true
-            text.Visible = true
-        else
-            box.Visible = false
-            outline.Visible = false
-            text.Visible = false
-        end
-
-        task.wait(0.05)
-        elapsed += 0.05
-    end
-
-    outline:Remove()
-    box:Remove()
-    text:Remove()
-end
-
-local function watchObject(instance, label, color)
-    task.spawn(function()
-        while instance.Parent do
-            createESPOnce(instance, label, color)
-        end
-    end)
 end
 
 local tracked = {}
@@ -98,10 +21,11 @@ while true do
             local key = v.Name .. "_" .. tostring(hit.Position.X):sub(1, 6)
             if not tracked[key] then
                 tracked[key] = true
-                local label = v.Name == "Bag" and "Bag" or "Statue"
-                local color = v.Name == "Bag" and COLORS.Bag or COLORS.SafetyStatue
-                print(string.format("[ESP] Found %s at: %.1f, %.1f, %.1f", label, hit.Position.X, hit.Position.Y, hit.Position.Z))
-                watchObject(v, label, color)
+                print(string.format("[TP] Found %s at: %.1f, %.1f, %.1f", v.Name, hit.Position.X, hit.Position.Y, hit.Position.Z))
+                local torso = getTorso()
+                if torso then
+                    torso.CFrame = hit.CFrame
+                end
             end
         end
     end
