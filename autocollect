@@ -21,7 +21,7 @@ while true do
             local key = v.Name .. "_" .. tostring(hit.Position.X):sub(1, 6)
             if not tracked[key] then
                 tracked[key] = true
-                print(string.format("[TP] Found %s at: %.1f, %.1f, %.1f", v.Name, hit.Position.X, hit.Position.Y, hit.Position.Z))
+                print(string.format("Found %s at: %.1f, %.1f, %.1f", v.Name, hit.Position.X, hit.Position.Y, hit.Position.Z))
                 local torso = getTorso()
                 if torso then
                     torso.CFrame = hit.CFrame
